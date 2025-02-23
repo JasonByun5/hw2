@@ -9,6 +9,7 @@
 #include "db_parser.h"
 #include "product_parser.h"
 #include "util.h"
+#include "mydatastore.h"
 
 using namespace std;
 struct ProdNameSorter {
@@ -29,7 +30,7 @@ int main(int argc, char* argv[])
      * Declare your derived DataStore object here replacing
      *  DataStore type to your derived type
      ****************/
-    DataStore ds;
+    MyDataStore ds;
 
 
 
@@ -100,8 +101,39 @@ int main(int argc, char* argv[])
                 done = true;
             }
 	    /* Add support for other commands here */
-
-
+            else if (cmd == "ADD"){
+              string username;
+              int hitIndex;
+              
+              if(ss >> username >> hitIndex){
+                if(hitIndex < 1 || hitIndex > (int)hits.size()){
+                  cout<< "Invalid request" << endl<< flush;
+                }else{
+                  Product* selectProduct = hits[hitIndex -1];
+                  ds.addToCart(username, selectProduct);
+                }
+              } 
+              else{
+                cout<< "Invalid request" << endl;
+                continue;
+              }
+            }
+            else if (cmd == "VIEWCART"){
+              string username;
+              if(ss >> username){
+                ds.viewCart(username);
+              }else{
+                cout << "Invalid request" << endl;
+              }
+            }
+            else if( cmd == "BUYCART"){
+              string username;
+              if(ss >> username){
+                ds.buyCart(username);
+              }else{
+                cout << "Invalid request" << endl;
+              }
+            } 
 
 
             else {
@@ -115,16 +147,18 @@ int main(int argc, char* argv[])
 
 void displayProducts(vector<Product*>& hits)
 {
-    int resultNo = 1;
-    if (hits.begin() == hits.end()) {
+    if (hits.empty()) {
     	cout << "No results found!" << endl;
     	return;
     }
-    std::sort(hits.begin(), hits.end(), ProdNameSorter());
-    for(vector<Product*>::iterator it = hits.begin(); it != hits.end(); ++it) {
-        cout << "Hit " << setw(3) << resultNo << endl;
-        cout << (*it)->displayString() << endl;
+
+    vector<Product*> sortedHits = hits;
+    std::sort(sortedHits.begin(), sortedHits.end(), ProdNameSorter());
+
+    for(size_t i =0; i < sortedHits.size(); i++) {
+        cout << "Hit " << setw(3) << (i+1) << endl;
+        cout << sortedHits[i]->displayString() << endl;
         cout << endl;
-        resultNo++;
     }
 }
+

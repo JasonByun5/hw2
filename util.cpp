@@ -15,16 +15,34 @@ std::string convToLower(std::string src)
     to a set of words based on the criteria given in the assignment **/
 std::set<std::string> parseStringToWords(string rawWords)
 {
+  trim(rawWords);
+  std::set<string> keyWords;
+  std::string temp;
+  
+  //loops thorught the word and checks if it is a number or now. If it is then it will add, else will not
+  for(size_t i =0; i< rawWords.length(); i++){
+    if(std::isalnum(rawWords[i])){
+      temp.push_back(std::tolower(rawWords[i]));
+    }
+    else{
+      if(!temp.empty() && std::isdigit(temp[0]) && (i + 1 < rawWords.size()) && std::isdigit(rawWords[i+1])){
+        temp.push_back(rawWords[i]);
+      }else{
+        if(temp.length() >= 2){
+          keyWords.insert(temp);
+        }
+        temp.clear();
+      }
+    }
+  }
+
+  //checks that last few letters left if they can make up a keyword
+  if(temp.length() >= 2){
+    keyWords.insert(temp);
+  }
 
 
-
-
-
-
-
-
-
-
+  return keyWords;
 }
 
 /**************************************************
